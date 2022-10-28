@@ -1,0 +1,171 @@
+// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file. See the AUTHORS file for names of contributors.
+
+#include "db/dbformat.h"
+
+#include "gtest/gtest.h"
+#include "util/logging.h"
+
+using namespace spatial;
+
+namespace leveldb {
+
+static std::string IKey(const std::string& user_key, uint64_t seq,
+                        ValueType vt, ValidTime time, Linear x, Linear y) {
+  std::string encoded;
+  AppendInternalKey(&encoded, ParsedInternalKey(user_key, seq, vt, time, x, y));
+  return encoded;
+}
+
+static std::string Shorten(const std::string& s, const std::string& l) {
+  std::string result = s;
+  InternalKeyComparator(BytewiseComparator()).FindShortestSeparator(&result, l);
+  return result;
+}
+
+static std::string ShortSuccessor(const std::string& s) {
+  std::string result = s;
+  InternalKeyComparator(BytewiseComparator()).FindShortSuccessor(&result);
+  return result;
+}
+
+static void TestKey(const std::string& key, uint64_t seq, ValueType vt,
+                    ValidTime time, Linear x, Linear y) {
+  std::string encoded = IKey(key, seq, vt, time, x, y);
+
+  Slice in(encoded);
+  ParsedInternalKey decoded("", 0, kTypeValue, 0, 0, 0);
+
+  ASSERT_TRUE(ParseInternalKey(in, &decoded));
+  ASSERT_EQ(key, decoded.user_key.ToString());
+  ASSERT_EQ(seq, decoded.sequence);
+  ASSERT_EQ(vt, decoded.type);
+  ASSERT_EQ(time, decoded.time);
+  ASSERT_EQ(x, decoded.x);
+  ASSERT_EQ(y, decoded.y);
+
+  ASSERT_TRUE(!ParseInternalKey(Slice("bar"), &decoded));
+}
+
+TEST(FormatTest, InternalKey_EncodeDecode) {
+  const char* keys[] = {"", "k", "hello", "longggggggggggggggggggggg"};
+  const uint64_t seq[] = {1,
+                          2,
+                          3,
+                          (1ull << 8) - 1,
+                          1ull << 8,
+                          (1ull << 8) + 1,
+                          (1ull << 16) - 1,
+                          1ull << 16,
+                          (1ull << 16) + 1,
+                          (1ull << 32) - 1,
+                          1ull << 32,
+                          (1ull << 32) + 1};
+  const ValidTime times[] = {0,1,2,3,4,5,1633089473};
+  const spatial::Linear coord[] = {0,1,2,3,4,5,kOmitCoordinate-1};
+  for (int k = 0; k < sizeof(keys) / sizeof(keys[0]); k++) {
+    for (int s = 0; s < sizeof(seq) / sizeof(seq[0]); s++) {
+      for (auto t:times) {
+        for (auto x:coord) {
+          TestKey(keys[k], seq[s], kTypeValue, t, x, x);
+          TestKey("hello", 1, kTypeDeletion, t, x, x);
+        }
+      }
+    }
+  }
+}
+
+TEST(FormatTest, InternalKey_DecodeFromEmpty) {
+  InternalKey internal_key;
+
+  ASSERT_TRUE(!internal_key.DecodeFrom(""));
+}
+
+TEST(FormatTest, InternalKeyShortSeparator) {
+  // When user keys are same
+  ASSERT_EQ(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                 kOmitCoordinate),
+            Shorten(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate),
+                    IKey("foo", 99, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate)));
+  ASSERT_EQ(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                 kOmitCoordinate),
+            Shorten(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate),
+                    IKey("foo", 101, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate)));
+  ASSERT_EQ(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                 kOmitCoordinate),
+            Shorten(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate),
+                    IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate)));
+  ASSERT_EQ(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                 kOmitCoordinate),
+            Shorten(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate),
+                    IKey("foo", 100, kTypeDeletion, kMaxValidTime,
+                         kOmitCoordinate, kOmitCoordinate)));
+
+  // When user keys are misordered
+  ASSERT_EQ(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                 kOmitCoordinate),
+            Shorten(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate),
+                    IKey("bar", 99, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate)));
+
+  // When user keys are different, but correctly ordered
+  ASSERT_EQ(IKey("g", kMaxSequenceNumber, kValueTypeForSeek, kMaxValidTime,
+                 kOmitCoordinate, kOmitCoordinate),
+            Shorten(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate),
+                    IKey("hello", 200, kTypeValue, kMaxValidTime,
+                         kOmitCoordinate, kOmitCoordinate)));
+
+  // When start user key is prefix of limit user key
+  ASSERT_EQ(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                 kOmitCoordinate),
+            Shorten(IKey("foo", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate),
+                    IKey("foobar", 200, kTypeValue, kMaxValidTime,
+                         kOmitCoordinate, kOmitCoordinate)));
+
+  // When limit user key is prefix of start user key
+  ASSERT_EQ(IKey("foobar", 100, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                 kOmitCoordinate),
+            Shorten(IKey("foobar", 100, kTypeValue, kMaxValidTime,
+                         kOmitCoordinate, kOmitCoordinate),
+                    IKey("foo", 200, kTypeValue, kMaxValidTime, kOmitCoordinate,
+                         kOmitCoordinate)));
+}
+//
+//TEST(FormatTest, InternalKeyShortestSuccessor) {
+//  ASSERT_EQ(IKey("g", kMaxSequenceNumber, kValueTypeForSeek),
+//            ShortSuccessor(IKey("foo", 100, kTypeValue)));
+//  ASSERT_EQ(IKey("\xff\xff", 100, kTypeValue),
+//            ShortSuccessor(IKey("\xff\xff", 100, kTypeValue)));
+//}
+//
+//TEST(FormatTest, ParsedInternalKeyDebugString) {
+//  ParsedInternalKey key("The \"key\" in 'single quotes'", 42, kTypeValue);
+//
+//  ASSERT_EQ("'The \"key\" in 'single quotes'' @ 42 : 1", key.DebugString());
+//}
+//
+//TEST(FormatTest, InternalKeyDebugString) {
+//  InternalKey key("The \"key\" in 'single quotes'", 42, kTypeValue);
+//  ASSERT_EQ("'The \"key\" in 'single quotes'' @ 42 : 1", key.DebugString());
+//
+//  InternalKey invalid_key;
+//  ASSERT_EQ("(bad)", invalid_key.DebugString());
+//}
+
+}  // namespace leveldb
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
