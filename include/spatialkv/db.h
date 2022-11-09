@@ -1,0 +1,8 @@
+//
+// Created by xiaofzhao4 on 3/29/2023.
+//
+
+#ifndef SPATIALKV_INCLUDE_SPATIALKV_DB_H_
+#define SPATIALKV_INCLUDE_SPATIALKV_DB_H_
+
+#endif  // SPATIALKV_INCLUDE_SPATIALKV_DB_H_

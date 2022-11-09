@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package keys;
+
+message SpatialKey {
+  uint32 type = 1;
+  uint64 location = 2;
+  uint64 time = 3;
+  uint32 id = 4;
+  uint64 seq = 5;
+}
