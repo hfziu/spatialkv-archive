@@ -17,16 +17,12 @@ struct KeyEncoder {
   static std::string Decode(const std::string& key);
 };
 
-struct SpatialEncoder {
-  virtual uint64_t Encode(const Coordinate& coord) = 0;
-//  virtual std::string Decode(const std::string& key) = 0;
+class SpatialEncoder {
+ public:
+  virtual uint64_t Encode(const Coordinate& coord) const = 0;
 };
 
-struct S2CellIdEncoder : SpatialEncoder {
- public:
-  uint64_t Encode(const Coordinate& coord) override;
-//  std::string Decode(const std::string& key) override;
-};
+const SpatialEncoder* S2CellIdEncoder();
 
 }  // namespace spatialkv
 

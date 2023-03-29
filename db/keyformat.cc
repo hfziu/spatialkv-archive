@@ -4,20 +4,20 @@
 
 #include "spatialkv/keyformat.h"
 
-#include "keys.pb.h"
+#include "util/coding.h"
 
 namespace spatialkv {
 
 std::string SpatialKey::Encode() const {
-  auto skey = std::make_unique<keys::SpatialKey>();
-  skey->set_type(type_);
-  skey->set_id(stream_id_);
-  skey->set_seq(sequence_number_);
-  skey->set_time(valid_time_);
-  skey->set_location(spatial_encoder_->Encode(coordinate_));
-  std::string encoded;
-  skey->SerializeToString(&encoded);
-  return encoded;
+  std::string result = std::move(std::to_string(type_));
+  result.append(
+      IntegerEncoder::EncodeFixed64(spatial_encoder_->Encode(coordinate_)));
+  return result;
+}
+
+std::string SpatialKey::DebugString() const {
+  return "SpatialKey:(" + std::to_string(coordinate_.lat) + "," +
+         std::to_string(coordinate_.lng) + ")";
 }
 
 }  // namespace spatialkv

@@ -50,26 +50,22 @@ class SpatialKey : public Key {
   SpatialKey() = default;
   ~SpatialKey() override = default;
 
-  SpatialKey(const StreamID id, const ValidTime t, const SequenceNumber seq,
-             const Coordinate& coordinate, SpatialEncoder* encoder)
-      : stream_id_(id),
-        valid_time_(t),
-        sequence_number_(seq),
-        coordinate_(coordinate),
+  SpatialKey(const Coordinate& coordinate,
+             const SpatialEncoder* encoder)
+      : coordinate_(coordinate),
         spatial_encoder_(encoder) {}
 
+  // Serialize the key into a string.
   [[nodiscard]] std::string Encode() const override;
 
+  // Print the key in human readable format.
   [[maybe_unused]] [[nodiscard]] std::string DebugString() const override;
 
  private:
   KeyType type_{kSpatial};
-  StreamID stream_id_{};
-  SequenceNumber sequence_number_{};
-  ValidTime valid_time_{};
   Coordinate coordinate_{};  // raw location
 
-  SpatialEncoder* spatial_encoder_{};
+  const SpatialEncoder* spatial_encoder_{};
 
 };
 

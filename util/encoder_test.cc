@@ -8,9 +8,11 @@
 
 namespace spatialkv {
 
+auto s2encoder = S2CellIdEncoder();
+
 TEST(Encoder, ExampleLocation0) {
-  auto encoder = std::make_unique<S2CellIdEncoder>();
-  std::cout << encoder->Encode({0, 1}) << std::endl;
+
+  std::cout << s2encoder->Encode({0, 1}) << std::endl;
 }
 
 }  // namespace spatialkv

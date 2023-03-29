@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package values;
+
+message TemporalEntry {
+  uint64 sequence = 1;
+  double lat = 2;
+  double lng = 3;
+  string body = 4;
+}
+
+message SpatialEntry {
+  uint64 trip_id = 1;
+  uint64 time = 2;
+  uint64 sequence = 3;
+  double lat = 4;
+  double lng = 5;
+  string body = 6;
+}
