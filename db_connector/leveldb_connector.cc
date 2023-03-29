@@ -5,7 +5,7 @@
 #include <iostream>
 #include "db_connector/connector.h"
 
-namespace smvkv {
+namespace spatialkv {
 
 LevelDBConnector::~LevelDBConnector() { delete db_; }
 
@@ -26,4 +26,4 @@ Status LevelDBConnector::Get(const std::string& key, std::string* value) {
   return db_->Get(read_options_, key, value);
 }
 
-}  // namespace smvkv
+}  // namespace spatialkv

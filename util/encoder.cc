@@ -4,9 +4,13 @@
 
 #include "encoder.h"
 
-namespace smvkv {
+namespace spatialkv {
 
-// TODO: implement Encode and Decode
-std::string KeyEncoder::Encode(const std::string& key) { return key; }
+uint64_t S2CellIdEncoder::Encode(const Coordinate& coord) {
+  // Given a latitude-longitude coordinate, return the corresponding S2CellId.
+  S2LatLng ll = S2LatLng::FromDegrees(coord.lat, coord.lng);
+  auto cell_id = S2CellId(ll);
+  return cell_id.id();
+}
 
-} // namespace smvkv
+} // namespace spatialkv

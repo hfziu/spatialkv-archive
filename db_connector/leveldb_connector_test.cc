@@ -5,7 +5,7 @@
 #include "db_connector/connector.h"
 #include "gtest/gtest.h"
 
-namespace smvkv {
+namespace spatialkv {
 
 TEST(Connector, Empty) { Connector connector; }
 
@@ -33,4 +33,4 @@ TEST(LevelDBConnector, Get) {
   EXPECT_EQ(value, "value");
 }
 
-}  // namespace smvkv
+}  // namespace spatialkv

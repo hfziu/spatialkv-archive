@@ -10,7 +10,7 @@
 #include "leveldb/db.h"
 #include "leveldb/options.h"
 
-namespace smvkv {
+namespace spatialkv {
 
 using Status = leveldb::Status;
 
@@ -36,6 +36,6 @@ class LevelDBConnector : public Connector {
   leveldb::WriteOptions write_options_;
 };
 
-}  // namespace smvkv
+}  // namespace spatialkv
 
 #endif  // SMVKV_DB_CONNECTOR_CONNECTOR_H_

@@ -3,11 +3,14 @@
 //
 
 #include <string>
+#include "s2/s2cell_id.h"
+#include "s2/s2latlng.h"
+#include "spatialkv/dbformat.h"
 
 #ifndef SMVKV_UTIL_ENCODER_H_
 #define SMVKV_UTIL_ENCODER_H_
 
-namespace smvkv {
+namespace spatialkv {
 
 struct KeyEncoder {
   static std::string Encode(const std::string& key);
@@ -15,10 +18,16 @@ struct KeyEncoder {
 };
 
 struct SpatialEncoder {
-  virtual std::string Encode(const double lat, const double lon) = 0;
-  virtual std::string Decode(const std::string& key) = 0;
+  virtual uint64_t Encode(const Coordinate& coord) = 0;
+//  virtual std::string Decode(const std::string& key) = 0;
 };
 
-}  // namespace smvkv
+struct S2CellIdEncoder : SpatialEncoder {
+ public:
+  uint64_t Encode(const Coordinate& coord) override;
+//  std::string Decode(const std::string& key) override;
+};
+
+}  // namespace spatialkv
 
 #endif  // SMVKV_UTIL_ENCODER_H_
