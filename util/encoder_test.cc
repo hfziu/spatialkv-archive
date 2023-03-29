@@ -10,7 +10,7 @@ namespace spatialkv {
 
 TEST(Encoder, ExampleLocation0) {
   auto encoder = std::make_unique<S2CellIdEncoder>();
-  std::cout << encoder->Encode({0, 0}) << std::endl;
+  std::cout << encoder->Encode({0, 1}) << std::endl;
 }
 
 }  // namespace spatialkv

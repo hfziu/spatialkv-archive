@@ -53,6 +53,8 @@ target_sources(spatialkv
   "${SPATIALKV_PUBLIC_INCLUDE_DIR}/keyformat.h"
   )
 
+target_link_libraries(spatialkv leveldb s2)
+
 # This project uses GoogleTest
 # https://github.com/google/googletest
 find_package(GTest REQUIRED)
@@ -66,7 +68,7 @@ if (GTest_FOUND)
     get_filename_component(test_name ${filename} NAME_WE)
     add_executable(${test_name} ${filename})
     target_link_libraries(${test_name} GTest::gtest_main spatialkv)
-    target_link_libraries(${test_name} leveldb)
+    target_link_libraries(${test_name})
     gtest_discover_tests(${test_name})
   endfunction()
 

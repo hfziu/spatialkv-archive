@@ -8,8 +8,7 @@ namespace spatialkv {
 
 uint64_t S2CellIdEncoder::Encode(const Coordinate& coord) {
   // Given a latitude-longitude coordinate, return the corresponding S2CellId.
-  S2LatLng ll = S2LatLng::FromDegrees(coord.lat, coord.lng);
-  auto cell_id = S2CellId(ll);
+  auto cell_id = S2CellId(S2LatLng::FromDegrees(coord.lat, coord.lng));
   return cell_id.id();
 }
 
