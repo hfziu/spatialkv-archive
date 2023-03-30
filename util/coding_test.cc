@@ -11,9 +11,9 @@ namespace spatialkv {
 
 auto comparator = leveldb::BytewiseComparator();
 
-TEST(Coding, IntegerEncoder) {
-  auto& Encode = IntegerEncoder::EncodeFixed64;
-  auto& Decode = IntegerEncoder::DecodeFixed64;
+TEST(Coding, BigEndianEncoder) {
+  auto& Encode = BigEndianEncoder::EncodeFixed64;
+  auto& Decode = BigEndianEncoder::DecodeFixed64;
   for (int i = 0; i < 100; i++) {
     auto encoded = Encode(i);
     auto decoded = Decode(encoded);
@@ -24,10 +24,15 @@ TEST(Coding, IntegerEncoder) {
     auto decoded = Decode(encoded);
     ASSERT_EQ(0xffffffffffffffff - i, decoded);
   }
-  for (int i = 0; i < 1000; i++) {
+  // Verify that the encoded string preserves the ordering of the input.
+  // We use LevelDB's default BytewiseComparator.
+  for (int i = 0; i < 0xffff; i++) {
     auto encoded1 = Encode(i);
     auto encoded2 = Encode(i + 1);
     ASSERT_TRUE(0 > comparator->Compare(encoded1, encoded2));
+    auto encoded3 = Encode(0xffffffffffffffff - i);
+    auto encoded4 = Encode(0xffffffffffffffff - i - 1);
+    ASSERT_TRUE(0 < comparator->Compare(encoded3, encoded4));
   }
 }
 
