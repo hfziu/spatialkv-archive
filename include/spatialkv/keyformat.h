@@ -39,7 +39,7 @@ class TemporalKey : public Key {
 
  private:
   KeyType type_{kTemporal};
-  StreamID stream_id_{};
+  TripID stream_id_{};
   SequenceNumber sequence_number_{};
   ValidTime valid_time_{};
   Coordinate coordinate_{};  // raw location

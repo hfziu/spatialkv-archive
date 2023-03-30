@@ -31,9 +31,13 @@ class SpatialKV {
   Status Put(const Slice& key, uint64_t time, uint64_t seq,
              const Coordinate& coord, const Slice& value);
 
+  // Get a point that is within the distance (kilometers) of the given coordinate.
+  Status GetSpatialPoint(const Coordinate& coord, ResultPointEntry* result,
+                         double distance = 1.0);
+
  private:
-   std::unique_ptr<Connector> db_connector_{};
-   const SpatialEncoder* spatial_encoder_{};
+  std::unique_ptr<Connector> db_connector_{};
+  const SpatialEncoder* spatial_encoder_{};
 };
 
 }  // namespace spatialkv

@@ -5,6 +5,7 @@
 #ifndef SPATIALKV_UTIL_CODING_H_
 #define SPATIALKV_UTIL_CODING_H_
 
+#include <array>
 #include <memory>
 #include <string>
 #include <string_view>

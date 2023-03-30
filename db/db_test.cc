@@ -8,6 +8,7 @@
 #include <string>
 
 #include "gtest/gtest.h"
+#include "spatialkv/dbformat.h"
 #include "util/random.h"
 
 namespace fs = std::filesystem;
@@ -33,9 +34,20 @@ TEST(SpatialKV, Put) {
 
   // feed random data
   for (int i = 0; i < 0xff; ++i) {
-    db.Put(std::to_string(random_int(0, 0xff)), i, i,
-           {random_double(-90, 90), random_double(-180, 180)},
-           std::to_string(random_int(0, 0xff)));
+    std::string key = std::to_string(random_int(0, 0xff));
+    double lat = random_double(-90, 90);
+    double lng = random_double(-180, 180);
+    std::string value = std::to_string(random_int(0, 0xff));
+    auto s_put = db.Put(key, i, i, {lat, lng}, value);
+    EXPECT_TRUE(s_put.ok());
+
+    // read the data entry
+    ResultPointEntry result;
+    auto s_get = db.GetSpatialPoint({lat, lng}, &result);
+    EXPECT_TRUE(s_get.ok());
+    EXPECT_EQ(result.trip_id(), key);
+    EXPECT_EQ(result.value(), value);
+    if (i % 5 == 0) std::cout << result.DebugString() << std::endl;
   }
 
   fs::remove_all(db_path);
