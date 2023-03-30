@@ -26,7 +26,7 @@ if (Protobuf_FOUND)
   include_directories(${Protobuf_INCLUDE_DIRS})
   target_link_libraries(spatialkv ${Protobuf_LIBRARIES})
   protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS "proto/values.proto")
-  target_include_directories(spatialkv PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  target_include_directories(spatialkv PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
   target_sources(spatialkv
       PRIVATE
       ${PROTO_SRCS}
