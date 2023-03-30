@@ -11,7 +11,7 @@ namespace spatialkv {
 std::string SpatialKey::Encode() const {
   std::string result = std::move(std::to_string(type_));
   result.append(
-      IntegerEncoder::EncodeFixed64(spatial_encoder_->Encode(coordinate_)));
+          BigEndianEncoder::EncodeFixed64(spatial_encoder_->Encode(coordinate_)));
   return result;
 }
 

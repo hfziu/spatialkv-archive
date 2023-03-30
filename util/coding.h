@@ -15,37 +15,36 @@ namespace spatialkv {
 
 namespace {
 
-class IntegerEncoder {
+class BigEndianEncoder {
  public:
   [[nodiscard]] static std::string EncodeFixed64(uint64_t value);
-  [[nodiscard]] static uint64_t DecodeFixed64(std::string_view value);
 
- private:
-  static std::string valid_chars_;
+  [[nodiscard]] static uint64_t DecodeFixed64(std::string_view big_endian);
+
+  static void PutFixed64(std::string *dst, uint64_t value);
 };
 
-std::string IntegerEncoder::valid_chars_ =
-      "0123456789<>"
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      "abcdefghijklmnopqrstuvwxyz";
-
 // Encode a 64-bit integer into a fixed-length string.
-std::string IntegerEncoder::EncodeFixed64(uint64_t value){
-  auto buf = std::make_unique<char[]>(11);
-  for (int i = 10; i >= 0; --i) {
-    buf[i] = valid_chars_[value % valid_chars_.size()];
-    value /= valid_chars_.size();
+std::string BigEndianEncoder::EncodeFixed64(uint64_t value) {
+  std::array<unsigned char, 8> big_endian{};
+  for (int i = 7; i >= 0; --i) {
+    big_endian[i] = static_cast<char>((value)&0xff);
+    value >>= 8;
   }
-  return {buf.get()};
+  return {big_endian.begin(), big_endian.end()};
 }
 
-uint64_t IntegerEncoder::DecodeFixed64(std::string_view value){
-  uint64_t result = 0;
-  for (auto c : value) {
-    result *= valid_chars_.size();
-    result += valid_chars_.find(c);
+uint64_t BigEndianEncoder::DecodeFixed64(std::string_view big_endian) {
+  uint64_t value = 0;
+  for (auto c : big_endian) {
+    value <<= 8;
+    value += static_cast<uint8_t>(c);
   }
-  return result;
+  return value;
+}
+
+void BigEndianEncoder::PutFixed64(std::string *dst, uint64_t value) {
+  dst->append(EncodeFixed64(value));
 }
 
 }  // namespace

@@ -12,12 +12,17 @@
 
 namespace spatialkv {
 
+using Slice = leveldb::Slice;
 using Status = leveldb::Status;
 
 class Connector {
  public:
   Connector() = default;
   virtual ~Connector() = default;
+
+  virtual Status Open(const std::string& db_path) = 0;
+  virtual Status Put(const Slice& key, const Slice& value) = 0;
+  virtual Status Get(const Slice& key, std::string* value) = 0;
 };
 
 class LevelDBConnector : public Connector {
@@ -25,15 +30,15 @@ class LevelDBConnector : public Connector {
   LevelDBConnector();
   ~LevelDBConnector() override;
 
-  Status Open(const std::string& db_path);
-  Status Put(const std::string& key, const std::string& value);
-  Status Get(const std::string& key, std::string* value);
+  Status Open(const std::string& db_path) override;
+  Status Put(const Slice& key, const Slice& value) override;
+  Status Get(const Slice& key, std::string* value) override;
 
  private:
   leveldb::DB* db_{};
-  leveldb::Options options_;
-  leveldb::ReadOptions read_options_;
-  leveldb::WriteOptions write_options_;
+  leveldb::Options options_{leveldb::Options()};
+  leveldb::ReadOptions read_options_{leveldb::ReadOptions()};
+  leveldb::WriteOptions write_options_{leveldb::WriteOptions()};
 };
 
 }  // namespace spatialkv

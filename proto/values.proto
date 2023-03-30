@@ -10,7 +10,7 @@ message TemporalEntry {
 }
 
 message SpatialEntry {
-  uint64 trip_id = 1;
+  string trip_id = 1;
   uint64 time = 2;
   uint64 sequence = 3;
   double lat = 4;
