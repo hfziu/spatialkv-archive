@@ -10,10 +10,10 @@ add_library(spatialkv)
 #       to detect libleveldb automatically or import leveldb as a sub-module
 link_directories(${CMAKE_PREFIX_PATH}/lib /usr/local/lib)
 include_directories(
-  "${PROJECT_BINARY_DIR}/include"
-  "."
-  ${CMAKE_PREFIX_PATH}/include
-  /usr/local/include
+    "${PROJECT_BINARY_DIR}/include"
+    "."
+    ${CMAKE_PREFIX_PATH}/include
+    /usr/local/include
 )
 
 set(DB_CONNECTOR_PUBLIC_INCLUDE_DIR "include/db_connector")
@@ -28,34 +28,35 @@ if (Protobuf_FOUND)
   protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS "proto/values.proto")
   target_include_directories(spatialkv PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
   target_sources(spatialkv
-    PRIVATE
-    ${PROTO_SRCS}
-    ${PROTO_HDRS}
-    )
+      PRIVATE
+      ${PROTO_SRCS}
+      ${PROTO_HDRS}
+      )
 endif ()
 
 target_include_directories(spatialkv
-  PUBLIC
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-  )
+    PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    )
 
 target_sources(spatialkv
-  PRIVATE
-  "db_connector/leveldb_connector.cc"
-  "db/db_impl.cc"
-  "db/db_impl.h"
-  "db/keyformat.cc"
-  "util/coding.h"
-  "util/encoder.cc"
-  "util/encoder.h"
-  "util/no_destructor.h"
-  PUBLIC
-  "${DB_CONNECTOR_PUBLIC_INCLUDE_DIR}/connector.h"
-  "${SPATIALKV_PUBLIC_INCLUDE_DIR}/db.h"
-  "${SPATIALKV_PUBLIC_INCLUDE_DIR}/dbformat.h"
-  "${SPATIALKV_PUBLIC_INCLUDE_DIR}/keyformat.h"
-  )
+    PRIVATE
+    "db_connector/leveldb_connector.cc"
+    "db/db_impl.cc"
+    "db/db_impl.h"
+    "db/keyformat.cc"
+    "util/coding.h"
+    "util/encoder.cc"
+    "util/encoder.h"
+    "util/no_destructor.h"
+    "util/random.h"
+    PUBLIC
+    "${DB_CONNECTOR_PUBLIC_INCLUDE_DIR}/connector.h"
+    "${SPATIALKV_PUBLIC_INCLUDE_DIR}/db.h"
+    "${SPATIALKV_PUBLIC_INCLUDE_DIR}/dbformat.h"
+    "${SPATIALKV_PUBLIC_INCLUDE_DIR}/keyformat.h"
+    )
 
 target_link_libraries(spatialkv leveldb s2)
 
@@ -76,6 +77,7 @@ if (GTest_FOUND)
     gtest_discover_tests(${test_name})
   endfunction()
 
+  spatialkv_test("db/db_test.cc")
   spatialkv_test("db/keyformat_test.cc")
   spatialkv_test("db_connector/leveldb_connector_test.cc")
   spatialkv_test("util/coding_test.cc")

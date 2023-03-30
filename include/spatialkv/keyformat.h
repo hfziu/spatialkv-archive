@@ -58,7 +58,7 @@ class SpatialKey : public Key {
   // Serialize the key into a string.
   [[nodiscard]] std::string Encode() const override;
 
-  // Print the key in human readable format.
+  // Print the key in human-readable format.
   [[maybe_unused]] [[nodiscard]] std::string DebugString() const override;
 
  private:

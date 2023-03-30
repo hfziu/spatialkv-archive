@@ -17,7 +17,7 @@ TEST(KeyFormat, ExampleLocation0) {
       auto key =
           SpatialKey({static_cast<Lat>(lat), static_cast<Lng>(lng)}, s2encoder);
       ASSERT_EQ(key.Encode().substr(1),  // skip key type
-                IntegerEncoder::EncodeFixed64(s2encoder->Encode(
+                BigEndianEncoder::EncodeFixed64(s2encoder->Encode(
                     {static_cast<Lat>(lat), static_cast<Lng>(lng)})));
     }
   }

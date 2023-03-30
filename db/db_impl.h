@@ -5,6 +5,8 @@
 #ifndef SPATIALKV_DB_DB_IMPL_H_
 #define SPATIALKV_DB_DB_IMPL_H_
 
+#include "spatialkv/db.h"
+
 namespace spatialkv {
 
 }  // namespace spatialkv
