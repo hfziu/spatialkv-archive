@@ -13,8 +13,14 @@ LevelDBConnector::LevelDBConnector() {
   options_.create_if_missing = true;
 }
 
-Status LevelDBConnector::Open(const std::string& db_path) {
-  return leveldb::DB::Open(options_, db_path, &db_);
+Status LevelDBConnector::Open(const optional<std::string>& db_path) {
+  if (db_path) {
+    return leveldb::DB::Open(options_, *db_path, &db_);
+  } else if (db_path_) {
+    return leveldb::DB::Open(options_, *db_path_, &db_);
+  } else {
+    return Status::InvalidArgument("db_path is not set");
+  }
 }
 
 Status LevelDBConnector::Put(const Slice& key, const Slice& value) {

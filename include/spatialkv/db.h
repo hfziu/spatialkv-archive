@@ -6,12 +6,15 @@
 #define SPATIALKV_INCLUDE_SPATIALKV_DB_H_
 
 #include <cstdint>
+#include <optional>
 #include <string_view>
 
 #include "db_connector/connector.h"
 #include "leveldb/db.h"
 #include "spatialkv/dbformat.h"
 #include "util/encoder.h"
+
+using std::optional;
 
 namespace spatialkv {
 
@@ -31,8 +34,9 @@ class SpatialKV {
   Status Put(const Slice& key, uint64_t time, uint64_t seq,
              const Coordinate& coord, const Slice& value);
 
-  // Get a point that is within the distance (kilometers) of the given coordinate.
-  Status GetSpatialPoint(const Coordinate& coord, ResultPointEntry* result,
+  // Get a point that is within the distance (kilometers in geodetic distance)
+  // of the given coordinate.
+  optional<ResultPointEntry> GetSpatialPoint(const Coordinate& coord,
                          double distance = 1.0);
 
  private:

@@ -5,8 +5,10 @@
 #include "db/db_impl.h"
 
 #include <memory>
+#include <optional>
 
 #include "db_connector/connector.h"
+#include "spatialkv/dbformat.h"
 #include "spatialkv/keyformat.h"
 #include "values.pb.h"
 
@@ -34,18 +36,17 @@ Status SpatialKV::Put(const Slice& key, uint64_t time, uint64_t seq,
 }
 
 // TODO: search adjacent cells to find the nearest point.
-Status SpatialKV::GetSpatialPoint(const Coordinate& coord,
-                                  ResultPointEntry* result, double distance) {
+optional<ResultPointEntry> SpatialKV::GetSpatialPoint(const Coordinate& coord,
+                                  double distance) {
   SpatialKey spatial_key{coord, spatial_encoder_};
   std::string value;
   Status s = db_connector_->Get(spatial_key.Encode(), &value);
   if (!s.ok()) {
-    return s;
+    return std::nullopt;
   }
   values::SpatialEntry entry;
   entry.ParseFromString(value);
-  result->FromPbSpatialEntry(entry);
-  return Status::OK();
+  return ResultPointEntry(entry);
 }
 
 }  // namespace spatialkv

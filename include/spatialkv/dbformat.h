@@ -26,6 +26,14 @@ struct Coordinate {
 class ResultPointEntry {
  public:
   ResultPointEntry() = default;
+  ~ResultPointEntry() = default;
+  explicit ResultPointEntry(const values::SpatialEntry& pb_msg) {
+    FromPbSpatialEntry(pb_msg);
+  }
+  ResultPointEntry(const values::TemporalEntry& pb_msg, const TripID& trip_id,
+                   ValidTime time) {
+    FromPbTemporalEntry(pb_msg, trip_id, time);
+  }
 
   // Copy constructor.
   ResultPointEntry(const ResultPointEntry& other) {

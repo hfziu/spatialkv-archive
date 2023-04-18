@@ -3,7 +3,16 @@ project(spatialkv)
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Use clang++ as the compiler?
+#set(CMAKE_C_COMPILER "clang")
+#set(CMAKE_CXX_COMPILER "clang++")
+#set(CMAKE_THREAD_LIBS_INIT "-pthread")
+#set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+
 add_library(spatialkv)
+
+option(SPATIALKV_BUILD_BENCHMARK "Build benchmarks" ON)
 
 # Include LevelDB
 # TODO: sanitize the linker path
@@ -73,7 +82,6 @@ if (GTest_FOUND)
     get_filename_component(test_name ${filename} NAME_WE)
     add_executable(${test_name} ${filename})
     target_link_libraries(${test_name} GTest::gtest_main spatialkv)
-    target_link_libraries(${test_name})
     gtest_discover_tests(${test_name})
   endfunction()
 
@@ -84,4 +92,15 @@ if (GTest_FOUND)
   spatialkv_test("util/encoder_test.cc")
   spatialkv_test("util/no_destructor_test.cc")
   spatialkv_test("util/s2_test.cc")
+endif ()
+
+# Benchmarks
+if (SPATIALKV_BUILD_BENCHMARK)
+  function(spatialkv_benchmark bench_file)
+    get_filename_component(bench_name ${bench_file} NAME_WE)
+    add_executable(${bench_name} ${bench_file})
+    target_link_libraries(${bench_name} spatialkv)
+  endfunction()
+
+  spatialkv_benchmark("benchmarks/db_bench.cc")
 endif ()

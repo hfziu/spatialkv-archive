@@ -42,12 +42,11 @@ TEST(SpatialKV, Put) {
     EXPECT_TRUE(s_put.ok());
 
     // read the data entry
-    ResultPointEntry result;
-    auto s_get = db.GetSpatialPoint({lat, lng}, &result);
-    EXPECT_TRUE(s_get.ok());
-    EXPECT_EQ(result.trip_id(), key);
-    EXPECT_EQ(result.value(), value);
-    if (i % 5 == 0) std::cout << result.DebugString() << std::endl;
+    auto result = db.GetSpatialPoint({lat, lng});
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result->trip_id(), key);
+    EXPECT_EQ(result->value(), value);
+    if (i % 5 == 0) std::cout << result->DebugString() << std::endl;
   }
 
   fs::remove_all(db_path);
