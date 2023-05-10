@@ -3,6 +3,15 @@ project(spatialkv)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# LevelDB platform definitions (used by port/port.h)
+if (WIN32)
+  set(LEVELDB_PLATFORM_NAME LEVELDB_PLATFORM_WINDOWS)
+  # TODO(cmumford): Make UNICODE configurable for Windows.
+  add_definitions(-D_UNICODE -DUNICODE)
+else (WIN32)
+  set(LEVELDB_PLATFORM_NAME LEVELDB_PLATFORM_POSIX)
+endif (WIN32)
+
 add_library(spatialkv)
 
 # Include LevelDB
@@ -46,6 +55,9 @@ target_sources(spatialkv
   "db/db_impl.cc"
   "db/db_impl.h"
   "db/keyformat.cc"
+  "port/port.h"
+  "port/port_stdcxx.h"
+  "port/thread_annotations.h"
   "util/coding.h"
   "util/encoder.cc"
   "util/encoder.h"
@@ -59,6 +71,9 @@ target_sources(spatialkv
   )
 
 target_link_libraries(spatialkv leveldb s2)
+target_compile_definitions(spatialkv PRIVATE
+  # LevelDB platform definitions (used by port/port.h)
+  ${LEVELDB_PLATFORM_NAME}=1)
 
 # This project uses GoogleTest
 # https://github.com/google/googletest
