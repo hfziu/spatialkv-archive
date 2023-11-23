@@ -17,7 +17,7 @@ add_library(spatialkv)
 # Include LevelDB
 # TODO: sanitize the linker path
 #       to detect libleveldb automatically or import leveldb as a sub-module
-link_directories(${CMAKE_PREFIX_PATH}/lib /usr/local/lib)
+link_directories(${CMAKE_PREFIX_PATH}/lib /usr/local/lib /opt/homebrew/lib)
 include_directories(
   "${PROJECT_BINARY_DIR}/include"
   "."
@@ -28,7 +28,9 @@ include_directories(
 set(DB_CONNECTOR_PUBLIC_INCLUDE_DIR "include/db_connector")
 set(SPATIALKV_PUBLIC_INCLUDE_DIR "include/spatialkv")
 
+find_package(Protobuf CONFIG)
 find_package(Protobuf REQUIRED)
+set(protobuf_MODULE_COMPATIBLE true)
 if (Protobuf_FOUND)
   message(STATUS "Using protobuf ${Protobuf_VERSION}")
   set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
@@ -70,7 +72,9 @@ target_sources(spatialkv
   "${SPATIALKV_PUBLIC_INCLUDE_DIR}/keyformat.h"
   )
 
-target_link_libraries(spatialkv leveldb s2)
+# TODO: I have to explicitly link specific Abseil libraries for Protobuf to compile.
+# https://github.com/protocolbuffers/protobuf/issues/12292
+target_link_libraries(spatialkv leveldb s2 absl_log_internal_message absl_log_internal_check_op)
 target_compile_definitions(spatialkv PRIVATE
   # LevelDB platform definitions (used by port/port.h)
   ${LEVELDB_PLATFORM_NAME}=1)

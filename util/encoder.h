@@ -19,7 +19,7 @@ struct KeyEncoder {
 
 class SpatialEncoder {
  public:
-  virtual uint64_t Encode(const Coordinate& coord) const = 0;
+  [[nodiscard]] virtual uint64_t Encode(const Coordinate& coord) const = 0;
 };
 
 const SpatialEncoder* S2CellIdEncoder();

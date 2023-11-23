@@ -5,6 +5,8 @@
 #ifndef SPATIALKV_SPATIALKV_KEYFORMAT_H_
 #define SPATIALKV_SPATIALKV_KEYFORMAT_H_
 
+#include <utility>
+
 #include "util/encoder.h"
 
 namespace spatialkv {
@@ -43,6 +45,24 @@ class TemporalKey : public Key {
   SequenceNumber sequence_number_{};
   ValidTime valid_time_{};
   Coordinate coordinate_{};  // raw location
+};
+
+class TemporalLookupKey : public Key {
+ public:
+  TemporalLookupKey() = default;
+  ~TemporalLookupKey() override = default;
+
+  TemporalLookupKey(TripID trip_id, ValidTime time)
+      : stream_id_(std::move(trip_id)), valid_time_(time) {}
+
+  [[nodiscard]] std::string Encode() const override;
+
+  [[maybe_unused]] [[nodiscard]] std::string DebugString() const override;
+
+ private:
+  KeyType type_{kTemporal};
+  TripID stream_id_{};
+  ValidTime valid_time_{};
 };
 
 class SpatialKey : public Key {

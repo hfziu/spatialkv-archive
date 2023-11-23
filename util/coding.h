@@ -48,6 +48,19 @@ void BigEndianEncoder::PutFixed64(std::string *dst, uint64_t value) {
   dst->append(EncodeFixed64(value));
 }
 
+std::string EncodeDouble(double value) {
+  std::string result;
+  result.resize(sizeof(double));
+  memcpy(&result[0], &value, sizeof(double));
+  return result;
+}
+
+double DecodeDouble(std::string_view value) {
+  double result;
+  memcpy(&result, &value[0], sizeof(double));
+  return result;
+}
+
 }  // namespace
 
 }  // namespace spatialkv

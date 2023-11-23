@@ -35,6 +35,12 @@ class SpatialKV {
   Status GetSpatialPoint(const Coordinate& coord, ResultPointEntry* result,
                          double distance = 1.0);
 
+  Status GetTemporalPoint(const TripID& trip_id, ValidTime time,
+                          ResultPointEntry* result);
+
+  // Compact the live entries of key into static trajectory segments.
+  void Compact(const Slice& key);
+
  private:
   std::unique_ptr<Connector> db_connector_{};
   const SpatialEncoder* spatial_encoder_{};

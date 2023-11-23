@@ -33,7 +33,6 @@ Status SpatialKV::Put(const Slice& key, uint64_t time, uint64_t seq,
   return db_connector_->Put(spatial_key.Encode(), entry.SerializeAsString());
 }
 
-// TODO: search adjacent cells to find the nearest point.
 Status SpatialKV::GetSpatialPoint(const Coordinate& coord,
                                   ResultPointEntry* result, double distance) {
   SpatialKey spatial_key{coord, spatial_encoder_};
@@ -45,6 +44,22 @@ Status SpatialKV::GetSpatialPoint(const Coordinate& coord,
   values::SpatialEntry entry;
   entry.ParseFromString(value);
   result->FromPbSpatialEntry(entry);
+  return Status::OK();
+}
+
+Status SpatialKV::GetTemporalPoint(const spatialkv::TripID& trip_id,
+                                   spatialkv::ValidTime time,
+                                   spatialkv::ResultPointEntry* result) {
+  // encode the lookup key using the trip_id and time
+  TemporalLookupKey temporal_lookup_key{trip_id, time};
+  std::string value;
+  Status s = db_connector_->Get(temporal_lookup_key.Encode(), &value);
+  if (!s.ok()) {
+    return s;
+  }
+  values::TemporalEntry entry;
+  entry.ParseFromString(value);
+  result->FromPbTemporalEntry(entry, trip_id, time);
   return Status::OK();
 }
 
