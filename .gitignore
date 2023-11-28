@@ -94,3 +94,6 @@ fabric.properties
 
 # Temp: I'd like to ignore the whole .idea folder
 .idea/
+
+# Build
+build/

@@ -42,7 +42,10 @@ class SpatialKV {
   void Compact(const Slice& key);
 
  private:
-  std::unique_ptr<Connector> db_connector_{};
+  leveldb::DB* db_{};
+  leveldb::Options options_{leveldb::Options()};
+  leveldb::ReadOptions read_options_{leveldb::ReadOptions()};
+  leveldb::WriteOptions write_options_{leveldb::WriteOptions()};
   const SpatialEncoder* spatial_encoder_{};
 };
 

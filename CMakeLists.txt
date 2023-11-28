@@ -104,14 +104,3 @@ if (GTest_FOUND)
   spatialkv_test("util/no_destructor_test.cc")
   spatialkv_test("util/s2_test.cc")
 endif ()
-
-## Benchmarks
-add_executable(db_bench)
-target_sources(db_bench
-  PRIVATE
-  "util/histogram.h"
-  "util/histogram.cc"
-
-  "benchmarks/db_bench.cc"
-  )
-target_link_libraries(db_bench spatialkv)
