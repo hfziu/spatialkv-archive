@@ -65,6 +65,7 @@ target_sources(spatialkv
   "util/encoder.h"
   "util/no_destructor.h"
   "util/random.h"
+  "util/s2_util.h"
   PUBLIC
   "${DB_CONNECTOR_PUBLIC_INCLUDE_DIR}/connector.h"
   "${SPATIALKV_PUBLIC_INCLUDE_DIR}/db.h"
