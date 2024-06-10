@@ -1,15 +1,14 @@
-// Adapted from LevelDB.
-
 // Copyright (c) 2018 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
-#ifndef SPATIALKV_UTIL_NO_DESTRUCTOR_H_
+#ifndef STORAGE_LEVELDB_UTIL_NO_DESTRUCTOR_H_
+#define STORAGE_LEVELDB_UTIL_NO_DESTRUCTOR_H_
 
 #include <type_traits>
 #include <utility>
 
-namespace spatialkv {
+namespace leveldb {
 
 // Wraps an instance whose destructor is never called.
 //
@@ -42,8 +41,6 @@ class NoDestructor {
                                 alignof(InstanceType)>::type instance_storage_;
 };
 
-}  // namespace spatialkv
+}  // namespace leveldb
 
-#define SPATIALKV_UTIL_NO_DESTRUCTOR_H_
-
-#endif  // SPATIALKV_UTIL_NO_DESTRUCTOR_H_
+#endif  // STORAGE_LEVELDB_UTIL_NO_DESTRUCTOR_H_

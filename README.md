@@ -1,23 +1,25 @@
-# SpatialKV
+# Spatial LevelDB
 
-## Dependencies
+## Build
 
-- [s2geometry](https://github.com/google/s2geometry)
-- [leveldb](https://github.com/google/leveldb)
-- [googletest](https://github.com/google/googletest)
+### Prerequisites
 
-## Build with CMake
+- CMake
+- C/C++ Compiler, e.g., GCC
+
+### Build with CMake
 
 ```bash
-mkdir build
-cd build
-cmake ..
-cmake --build .
+cd spatial-leveldb
+cmake -H. -Bbuild
 
-# Run tests
-ctest --verbose
+cd build
+cmake --build .
 ```
 
-## Previous version
+### Run Tests
 
-This is a branch under development. In [`main`](https://github.com/hfziu/spatialkv/tree/main) branch, the previous version is implemented by extending leveldb.
+```bash
+# inside `build` directory
+ctest --verbose
+```

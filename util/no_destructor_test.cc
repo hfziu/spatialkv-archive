@@ -10,7 +10,7 @@
 
 #include "gtest/gtest.h"
 
-namespace spatialkv {
+namespace leveldb {
 
 namespace {
 
@@ -41,4 +41,9 @@ TEST(NoDestructorTest, StaticInstance) {
   ASSERT_EQ(kGoldenB, instance.get()->b);
 }
 
-}  // namespace spatialkv
+}  // namespace leveldb
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

@@ -1,5 +1,3 @@
-// Adapted from leveldb/util/histogram.cc:
-
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
@@ -9,9 +7,9 @@
 #include <cmath>
 #include <cstdio>
 
-//#include "port/port.h"
+#include "port/port.h"
 
-namespace spatialkv {
+namespace leveldb {
 
 const double Histogram::kBucketLimit[kNumBuckets] = {
     1,
@@ -176,8 +174,8 @@ void Histogram::Clear() {
   num_ = 0;
   sum_ = 0;
   sum_squares_ = 0;
-  for (double & bucket : buckets_) {
-    bucket = 0;
+  for (int i = 0; i < kNumBuckets; i++) {
+    buckets_[i] = 0;
   }
 }
 
@@ -271,4 +269,4 @@ std::string Histogram::ToString() const {
   return r;
 }
 
-}  // namespace spatialkv
+}  // namespace leveldb
